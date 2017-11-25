@@ -39,7 +39,7 @@ def init():
 
     # Telegram
     if not any([config.TELEGRAM_ID, config.TELEGRAM_HASH]):
-        print("Missing Telegram API keys in termgram/config.py")
+        print("Missing Telegram API keys at termgram/config.py")
         sys.exit(1)
     global client
     client = telethon.TelegramClient(config.SESSION_FILE, config.TELEGRAM_ID, config.TELEGRAM_HASH, update_workers=1)

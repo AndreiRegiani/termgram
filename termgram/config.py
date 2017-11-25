@@ -1,8 +1,8 @@
 import os
 
 # Generate API keys: https://my.telegram.org/apps
-TELEGRAM_ID = '' or os.environ['TELEGRAM_ID']
-TELEGRAM_HASH = '' or os.environ['TELEGRAM_HASH']
+TELEGRAM_ID = os.environ.get('TELEGRAM_ID', '')
+TELEGRAM_HASH = os.environ.get('TELEGRAM_HASH', '')
 
 CONFIG_DIR = os.path.expanduser('~') + '/.termgram/'
 SESSION_FILE = CONFIG_DIR + 'auth'
