@@ -3,7 +3,7 @@ import re
 from termgram import config
 
 
-class IgnoreFeature:
+class IgnoreHandler:
     """Don't display a message containing lines from ~/.termgram/ignore.txt
 
     Regex is considered if line starts and ends with a slash. (case insensitive)

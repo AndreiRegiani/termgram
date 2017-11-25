@@ -1,4 +1,4 @@
-# termgram
+# Termgram
 Friendly terminal-based Telegram client.
 
 ### Dependencies

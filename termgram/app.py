@@ -7,7 +7,8 @@ from telethon.tl import types
 from telethon.utils import get_display_name
 
 from termgram import config
-from termgram.ignore import IgnoreFeature
+from termgram.command import CommandHandler
+from termgram.ignore import IgnoreHandler
 
 
 # Telegram (Telethon)
@@ -21,8 +22,9 @@ message_list = None  # type: urwid.ListBox
 header_text = None  # type: urwid.Text
 input_field = None  # type: urwid.Edit
 
-# Features
-ignore_feature = IgnoreFeature()
+# Handlers
+command_handler = CommandHandler()
+ignore_handler = IgnoreHandler()
 
 
 def run():
@@ -47,7 +49,7 @@ def init():
 
     # UI
     global header_text
-    header_text = urwid.Text('termgram')
+    header_text = urwid.Text('Termgram')
     header_text.set_align_mode('center')
     global input_field
     input_field = urwid.Edit('>>> ')
@@ -74,15 +76,15 @@ def event_polling(update):
 
     if isinstance(update, (types.UpdateNewMessage, types.UpdateNewChannelMessage)):
         if update.message.from_id == current_chat.id or update.message.to_id.channel_id == current_chat.id:
-            display_message(update.message.date, update.message.from_id, update.message.message)
+            display_message(update.message.message, update.message.from_id)
 
     elif isinstance(update, types.UpdateShortMessage):
         if update.user_id == current_chat.id:
-            display_message(update.date, update.user_id, update.message)
+            display_message(update.message, update.user_id)
 
     elif isinstance(update, types.UpdateShortChatMessage):
         if update.chat_id == current_chat.id:
-            display_message(update.date, update.from_id, update.message)
+            display_message(update.message, update.from_id)
 
 
 def input_handler(key):
@@ -110,11 +112,15 @@ def message_input_handler(key):
 
     # Send message
     if key == 'enter':
-        my_message = input_field.get_edit_text()
-        if my_message.strip() and current_chat:
-            client.send_message(current_chat, my_message)
-            display_message(datetime.datetime.now(), client.get_me(), my_message)
+        my_message = input_field.get_edit_text().strip()
+        if my_message and current_chat:
             input_field.set_edit_text('')  # clear input
+            # Command Handler
+            if command_handler.run(my_message, current_chat, display_message):
+                return
+            # Regular Message
+            client.send_message(current_chat, my_message)
+            display_message(my_message, client.get_me())
 
     # @TODO: scroll logs up
     elif key == 'up':
@@ -193,7 +199,7 @@ def on_selected_chatroom(event, entity):
     for message in reversed(messages):
         # normal message
         if isinstance(message, types.Message):
-            display_message(message.date, client.get_entity(message.from_id), message.message)
+            display_message(message.message, client.get_entity(message.from_id))
 
         # notification messages
         elif isinstance(message, types.MessageService):
@@ -211,20 +217,21 @@ def on_selected_chatroom(event, entity):
                 pass
 
 
-def display_message(date, sender_id, message):
+def display_message(message: str, sender_id=None, date=None):
     """Appends new message to message logs"""
 
-    if ignore_feature.check(message):
+    if ignore_handler.check(message):
         return
-      
-    date = date.strftime(config.TIMESTAMP_FORMAT)
+
     if sender_id:
-        sender_name = get_display_name(sender_id)
-    else:
-        sender_name = '>>>'  # notification messages, command outputs, etc
-    if not message:
-        message = '{multimedia ¯\_(ツ)_/¯}'
-    message = " {} | {}: {}".format(date, sender_name, message)
+        if not date:
+            date = datetime.datetime.now()
+        if not message:
+            message = '{multimedia ¯\_(ツ)_/¯}'
+        date = date.strftime(config.TIMESTAMP_FORMAT)
+        sender_name = get_display_name(sender_id) + ': '
+        message = " {} | {}{}".format(date, sender_name, message)
+
     message_list.body.insert(-1, urwid.Text(message))
     message_list.set_focus(len(message_list.body)-1)
     mainloop.draw_screen()
