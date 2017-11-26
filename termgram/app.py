@@ -18,7 +18,8 @@ current_chat = None  # type: telethon.types.User|Channel
 # UI (Urwid)
 mainloop = None  # type: urwid.MainLoop
 mainframe = None  # type: urwid.Frame
-message_list = None  # type: urwid.ListBox
+columns = None  # type: urwid.Columns
+message_log = None  # type: urwid.ListBox
 header_text = None  # type: urwid.Text
 input_field = None  # type: urwid.Edit
 
@@ -51,6 +52,7 @@ def init():
     global header_text
     header_text = urwid.Text('Termgram')
     header_text.set_align_mode('center')
+
     global input_field
     input_field = urwid.Edit('>>> ')
 
@@ -137,16 +139,16 @@ def logs_input_handler(key):
 
 
 def chatlist_input_handler(key):
-    """Handles key events while chat list is in focus"""
+    """Handles key events while contact list is in focus"""
     pass
 
 
 def live_chatroom():
     """Main loop"""
 
-    global message_list
-    message_list = urwid.ListBox(urwid.SimpleFocusListWalker([urwid.Divider()]))
-    body = urwid.LineBox(message_list)
+    global message_log
+    message_log = urwid.ListBox(urwid.SimpleFocusListWalker([urwid.Divider()]))
+    body = urwid.LineBox(message_log)
 
     global mainframe
     mainframe = urwid.Frame(header=header_text, body=body, footer=input_field)
@@ -155,6 +157,7 @@ def live_chatroom():
     global columns
     contact_list_width = 25
     columns = urwid.Columns([mainframe, (contact_list_width, build_contact_list())])
+    columns.set_focus_column(1)  # Focus on contact list
 
     global mainloop
     mainloop = urwid.MainLoop(columns, unhandled_input=input_handler)
@@ -232,8 +235,8 @@ def display_message(message: str, sender_id=None, date=None):
         sender_name = get_display_name(sender_id) + ': '
         message = " {} | {}{}".format(date, sender_name, message)
 
-    message_list.body.insert(-1, urwid.Text(message))
-    message_list.set_focus(len(message_list.body)-1)
+    message_log.body.insert(-1, urwid.Text(message))
+    message_log.set_focus(len(message_log.body)-1)
     mainloop.draw_screen()
 
 
