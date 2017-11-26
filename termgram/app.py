@@ -118,7 +118,9 @@ def message_input_handler(key):
         if my_message and current_chat:
             input_field.set_edit_text('')  # clear input
             # Command Handler
-            if command_handler.run(my_message):
+            if my_message[0] == ':':
+                if not command_handler.run(my_message):
+                    display_message("Invalid command. See :help")
                 return
             # Regular Message
             client.send_message(current_chat, my_message)
