@@ -22,12 +22,13 @@ class IgnoreHandler:
                     self.pattern_list.append(line)
 
     def check(self, message):
+        message = message.strip().lower()
         for pattern in self.pattern_list:
             # Use Regex
             if pattern[0] == '/' and pattern[-1] == '/':
-                if re.match(pattern[1:-1], message.strip(), re.IGNORECASE):
+                if re.match(pattern[1:-1], message, re.IGNORECASE):
                     return True
             # Simple string match
             else:
-                if pattern.lower() in message.strip().lower():
+                if pattern.lower() in message:
                     return True

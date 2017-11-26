@@ -1,3 +1,6 @@
+import shlex
+
+
 class CommandHandler:
     """Use prefix : to run commands
 
@@ -8,7 +11,7 @@ class CommandHandler:
     def run(self, message: str) -> bool:
         if not message[0] == ':':
             return False
-        cmd, *args = message.split()
+        cmd, *args = shlex.split(message)  # shell-like split, to keep " " as one element even with spaces inside
         try:
             command_name = 'termgram.commands.' + cmd[1:]  # without':'
             command = __import__(command_name, fromlist=[''])
