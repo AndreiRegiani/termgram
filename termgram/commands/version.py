@@ -1,8 +1,9 @@
 import platform
 
+from termgram import app
 from termgram import config
 
 
-def run(args, current_chat, display_message):
+def run(args):
     message = "Termgram {}, Python {}".format(config.APP_VERSION, platform.python_version())
-    display_message(message)
+    app.display_message(message)

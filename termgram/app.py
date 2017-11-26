@@ -116,7 +116,7 @@ def message_input_handler(key):
         if my_message and current_chat:
             input_field.set_edit_text('')  # clear input
             # Command Handler
-            if command_handler.run(my_message, current_chat, display_message):
+            if command_handler.run(my_message):
                 return
             # Regular Message
             client.send_message(current_chat, my_message)
