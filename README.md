@@ -1,6 +1,8 @@
 # Termgram
 Friendly terminal-based Telegram client.
 
+![alt text](https://github.com/AndreiRegiani/termgram/blob/master/README.gif?raw=true)
+
 ### Dependencies
 * [Python 3](https://www.python.org/)
 * [Telethon](https://github.com/LonamiWebs/Telethon)
